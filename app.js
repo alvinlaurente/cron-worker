@@ -13,9 +13,16 @@ app.use(function(req, res, next) {
   next(createError(404));
 });
 
-schedule.scheduleJob('*/5 * * * * *', () => {
-  // axios.get('http://localhost:1337/v1/leaderboard/redeem/process-claim')
-  console.log('hallo');
+schedule.scheduleJob('*/10 * * * * *', async () => {
+  console.log('---------------------------------------------------------');
+  try {
+    const tester = await axios.get('http://localhost:1337/v1/leaderboard/redeem/process-claim')
+
+    console.log(tester.data)
+  } catch (error) {
+    console.log(error)
+  }
+  console.log('---------------------------------------------------------');
 })
 
 app.listen(port, () => {
