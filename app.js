@@ -1,10 +1,12 @@
-var createError = require('http-errors');
-var express = require('express');
-var axios = require('axios');
+const createError = require('http-errors');
+const express = require('express');
+const axios = require('axios');
 const schedule = require('node-schedule');
 
-var app = express();
-var port = 3000;
+require('dotenv').config()
+
+const app = express();
+const port = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -13,15 +15,17 @@ app.use(function(req, res, next) {
   next(createError(404));
 });
 
+const secret = process.env.PASSWORD
+const base_url = process.env.BASE_URL
+
 schedule.scheduleJob('*/10 * * * * *', async () => {
   console.log('---------------------------------------------------------');
-  try {
-    const tester = await axios.get('http://localhost:1337/v1/leaderboard/redeem/process-claim?pass=vokrafRedeemPoint')
-
-    console.log(tester.data)
-  } catch (error) {
-    console.log(error)
-  }
+  await axios
+    .get(`${base_url}/v1/leaderboard/redeem/process-claim?pass=${secret}`)
+    .then((res) => {
+      console.log(res.data)
+    })
+    .catch(err => console.log(err.message))
   console.log('---------------------------------------------------------');
 })
 
