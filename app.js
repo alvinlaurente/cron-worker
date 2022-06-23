@@ -16,7 +16,7 @@ app.use(function(req, res, next) {
 schedule.scheduleJob('*/10 * * * * *', async () => {
   console.log('---------------------------------------------------------');
   try {
-    const tester = await axios.get('http://localhost:1337/v1/leaderboard/redeem/process-claim')
+    const tester = await axios.get('http://localhost:1337/v1/leaderboard/redeem/process-claim?pass=vokrafRedeemPoint')
 
     console.log(tester.data)
   } catch (error) {
