@@ -6,7 +6,7 @@ const schedule = require('node-schedule');
 require('dotenv').config()
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -18,19 +18,33 @@ app.use(function(req, res, next) {
 const secret = process.env.PASSWORD
 const base_url = process.env.BASE_URL
 
-schedule.scheduleJob('*/10 * * * * *', async () => {
+let finish = true;
+let count = 0;
+const cron = schedule.scheduleJob('*/10 * * * * *', async () => {
   console.log('---------------------------------------------------------');
-  await axios
+
+  if (finish) {
+    finish = false
+    console.log("start", count)
+    await axios
     .get(`${base_url}/v1/leaderboard/redeem/process-claim?pass=${secret}`)
     .then((res) => {
-      console.log(res.data)
+      console.log(res.data.success, '/' , res.data.data);
+      finish = true
+      console.log('finish', count)
+      count++
     })
-    .catch(err => console.log(err.message))
+    .catch(err => {
+      console.log(err.message)
+      cron.cancel()
+    })
+  }
+
   console.log('---------------------------------------------------------');
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Cron App listening on port ${port}`)
 })
 
 module.exports = app;
